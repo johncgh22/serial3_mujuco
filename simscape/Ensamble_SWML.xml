@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<SimscapeMultibodyImportXML version="2.0" xmlns="urn:mathworks:SimscapeMultibody:import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Created by="" on="07/17/20||20:29:55" using="Simscape Multibody Link Version 6.1" from="SolidWorks 27.5.0"/>
+<ModelUnits mass="kilogram" length="centimeter"/>
+<DataUnits mass="kilogram" length="meter"/>
+<RootAssembly name="Ensamble_SWML" uid="Ensamble_SWML" version="146">
+<AssemblyFile name="Ensamble_SWML.SLDASM" type="SolidWorks Assembly"/>
+<InstanceTree>
+<Instance name="E2_2-1" uid="E2_2-1" entityUid="E2_2" rigid="true">
+<Transform>
+<Rotation>0.0078033792311770506 -0.99989613924785947 0.01211684735399738 9.4559296747484211e-05 -0.012116478380266762 -0.99992658831046199 0.99996954870191623 0.0078039521324881683 2.2245055885994802e-16</Rotation>
+<Translation>-0.056606609543239081 0.013641354531288296 0.2870808435569393</Translation>
+</Transform>
+<Instance name="AX-12A_mov-1" uid="AX-12A_mov-1" grounded="true" entityUid="AX-12A_mov" rigid="true">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>0.0083793067291237922 0.012765928800197453 0.050000000000000044</Translation>
+</Transform>
+<Instance name="AX-12A-01-1" uid="AX-12A-01-1" grounded="true" entityUid="AX-12A-01*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.023456049769281451 -0.010794999999999999 0</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-02-1" uid="AX-12A-02-1" entityUid="AX-12A-02*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.023456049769281451 -0.010795000000000013 0.013500000000000019</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-03-1" uid="AX-12A-03-1" entityUid="AX-12A-03*:*Default">
+<Transform>
+<Rotation>1 1.3877787807814457e-16 0 1.3270634591222574e-16 -1.0000000000000002 0 0 0 -1</Rotation>
+<Translation>-0.023456049769281451 -0.010794999999999999 -0.013500000000000002</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="FP04-F3-1" uid="FP04-F3-1" entityUid="FP04-F3*:*Predeterminado">
+<Transform>
+<Rotation>-1.8379395227974271e-15 -1 0 1.0000000000000002 -1.8249290967276011e-15 0 0 0 1</Rotation>
+<Translation>0.026423256959842378 0.0019709288001974606 0.050000000000000051</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A_mov-2" uid="AX-12A_mov-2" entityUid="AX-12A_mov" rigid="true">
+<Transform>
+<Rotation>-1 -1.9940646356353394e-15 -8.2011023253430508e-16 1.9940646356353394e-15 -1 1.4224605499288782e-16 -8.2011023253430538e-16 1.4224605499288619e-16 1</Rotation>
+<Translation>0.19846720719056099 -0.0088240711998022678 0.05000000000000001</Translation>
+</Transform>
+<Instance name="AX-12A-01-1" uid="AX-12A-01-1" grounded="true" entityUid="AX-12A-01*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.02345604976928134 -0.010794999999999999 0</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-02-1" uid="AX-12A-02-1" entityUid="AX-12A-02*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.02345604976928134 -0.010795000000000006 0.013500000000000019</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-03-1" uid="AX-12A-03-1" entityUid="AX-12A-03*:*Default">
+<Transform>
+<Rotation>1.0000000000000002 1.3877787807814457e-16 0 1.3270634591222574e-16 -1.0000000000000002 0 0 0 -1</Rotation>
+<Translation>-0.02345604976928134 -0.010794999999999999 -0.013499999999999998</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="AX-12A-04-1" uid="AX-12A-04-1" entityUid="AX-12A-04*:*Default">
+<Transform>
+<Rotation>0.98957130171718521 -0.14404387809884708 0 0.14404387809884708 0.98957130171718521 0 0 0 1</Rotation>
+<Translation>0.22192325695984239 0.0019709288001976827 0.070750000000000063</Translation>
+</Transform>
+</Instance>
+<Instance name="EnsamblajeTubo15-1" uid="EnsamblajeTubo15-1" entityUid="EnsamblajeTubo15" rigid="true">
+<Transform>
+<Rotation>1.9454923783079884e-15 1 0 -1 1.9454923783079884e-15 -1.6306527677903082e-16 -1.6306527677903082e-16 0 1</Rotation>
+<Translation>0.033238936159542432 0.0010550784707094724 0.027000000000000045</Translation>
+</Transform>
+<Instance name="Tubo15cm-1" uid="Tubo15cm-1" entityUid="Tubo15cm*:*Predeterminado">
+<Transform>
+<Rotation>0 0 1.0000000000000002 0 1.0000000000000002 0 -1 0 0</Rotation>
+<Translation>-0.0009158503294880091 -0.0048156791997000514 0.023000000000000007</Translation>
+</Transform>
+</Instance>
+<Instance name="BaseTubo-1" uid="BaseTubo-1" grounded="true" entityUid="BaseTubo*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.0009158503294880091 -0.0068156791997001087 0.023</Translation>
+</Transform>
+</Instance>
+<Instance name="BaseTubo-2" uid="BaseTubo-2" entityUid="BaseTubo*:*Predeterminado">
+<Transform>
+<Rotation>-1.0000000000000002 0 0 0 -1 0 0 0 1</Rotation>
+<Translation>-0.0009158503294880091 0.14718432080029992 0.023</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="FP04-F3-2" uid="FP04-F3-2" entityUid="FP04-F3*:*Predeterminado">
+<Transform>
+<Rotation>-1.8292659054175431e-15 1.0000000000000002 -1.5571549006387517e-16 1.0000000000000002 1.816255479347717e-15 1.9828668656273604e-16 1.9082085239465984e-16 -1.5621382378889117e-16 -1</Rotation>
+<Translation>0.18042325695984235 0.0019709288001977521 0.050000000000000037</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="Base1-1" uid="Base1-1" grounded="true" entityUid="Base1" rigid="true">
+<Transform>
+<Rotation>1 0 0 0 1.2246467991473532e-16 -1 0 1 1.2246467991473532e-16</Rotation>
+<Translation>-0.10941801383283346 -0.0041302995995730132 0.20418817174859269</Translation>
+</Transform>
+<Instance name="base1-1" uid="base1-1" entityUid="base1*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>0.015325843803892639 -0.011118231091401615 0.032000000000000008</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F53-2" uid="FP04-F53-2" entityUid="FP04-F53*:*Predeterminado">
+<Transform>
+<Rotation>-2.1684043449710079e-16 2.3365306711629554e-16 1 -2.6594729396502466e-16 1 -2.3365306711629559e-16 -1 -2.6594729396502475e-16 -2.1684043449710071e-16</Rotation>
+<Translation>0.028575843803892595 0.0020817689085984026 0.063500000000000001</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-04-1" uid="AX-12A-04-1" entityUid="AX-12A-04*:*Default">
+<Transform>
+<Rotation>0.18318001710812976 -0.9830793870956025 0 2.3150790751931415e-16 0 -0.99999999999999989 0.9830793870956025 0.18318001710812976 2.351152650115487e-16</Rotation>
+<Translation>0.05132584380389258 0.037331768908598406 0.032000000000000028</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F9-2" uid="FP04-F9-2" entityUid="FP04-F9*:*Predeterminado">
+<Transform>
+<Rotation>-2.1684043449710079e-16 1 -2.3365306711629554e-16 -2.6594729396502466e-16 -2.3365306711629559e-16 -1 -1 -2.1684043449710071e-16 2.6594729396502475e-16</Rotation>
+<Translation>0.028575843803892581 0.0020817689085984026 0.051000000000000024</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F3-2" uid="FP04-F3-2" entityUid="FP04-F3*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1.2246467991473532e-16 1 0 -1 1.2246467991473532e-16</Rotation>
+<Translation>0.028575843803892581 0.021081768908598392 0.051000000000000018</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A_mov-1" uid="AX-12A_mov-1" entityUid="AX-12A_mov" rigid="true">
+<Transform>
+<Rotation>-1 -4.9960036108132044e-16 0 0 2.4313117641872044e-16 1 -5.5511151231257827e-16 1.0000000000000004 -2.4313117641872024e-16</Rotation>
+<Translation>0.027869794034611151 0.021081768908598392 0.042794999999999972</Translation>
+</Transform>
+<Instance name="AX-12A-01-1" uid="AX-12A-01-1" grounded="true" entityUid="AX-12A-01*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.023456049769281416 -0.010795000000000013 0</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-02-1" uid="AX-12A-02-1" entityUid="AX-12A-02*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.023456049769281423 -0.010795000000000013 0.01350000000000004</Translation>
+</Transform>
+</Instance>
+<Instance name="AX-12A-03-1" uid="AX-12A-03-1" entityUid="AX-12A-03*:*Default">
+<Transform>
+<Rotation>1 1.3877787807814457e-16 0 0 -1.0000000000000004 0 0 0 -1</Rotation>
+<Translation>-0.023456049769281395 -0.010795000000000013 -0.013499999999999984</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="FP04-F53-3" uid="FP04-F53-3" entityUid="FP04-F53*:*Predeterminado">
+<Transform>
+<Rotation>-8.6736173798840374e-16 -2.659472939650247e-16 -1 2.3365306711629549e-16 1 -2.6594729396502485e-16 1 -2.3365306711629579e-16 -8.6736173798840365e-16</Rotation>
+<Translation>0.028575843803892623 0.0020817689085984026 0.00050000000000000218</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F9-3" uid="FP04-F9-3" entityUid="FP04-F9*:*Predeterminado">
+<Transform>
+<Rotation>-8.6736173798840374e-16 -1 2.659472939650247e-16 2.3365306711629549e-16 -2.6594729396502485e-16 -1 1 -8.6736173798840365e-16 2.3365306711629579e-16</Rotation>
+<Translation>0.028575843803892609 0.0020817689085984026 0.013000000000000005</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F3-3" uid="FP04-F3-3" entityUid="FP04-F3*:*Predeterminado">
+<Transform>
+<Rotation>-1 -1.0429405047882611e-15 0 0 2.4980018054066002e-16 1 -1.0429405047882611e-15 1 -2.4980018054066012e-16</Rotation>
+<Translation>0.028575843803892595 0.021081768908598392 0.013000000000000001</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F9-1" uid="FP04-F9-1" entityUid="FP04-F9*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 0 -1 0 1 0</Rotation>
+<Translation>0.0098258438038925783 0.0020817689085984026 0.032000000000000001</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F3-1" uid="FP04-F3-1" entityUid="FP04-F3*:*Predeterminado">
+<Transform>
+<Rotation>-1.7557876679985739e-16 1 0 2.4980018054066012e-16 0 1 1 1.7557876679985739e-16 -2.4980018054066012e-16</Rotation>
+<Translation>0.0098258438038925783 0.021081768908598392 0.032000000000000001</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F53-1" uid="FP04-F53-1" grounded="true" entityUid="FP04-F53*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.0026741561961074189 0.0020817689085984026 0.032000000000000001</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="E3_3-1" uid="E3_3-1" entityUid="E3_3" rigid="true">
+<Transform>
+<Rotation>0.01211684735399739 0.45942079021686094 0.88813609290846574 -0.99992658831046188 0.0055671402794841823 0.010762199538598896 2.1697337340298232e-16 -0.888201297266348 0.45945451954940697</Rotation>
+<Translation>-0.093353261583604435 -0.040624978873059457 0.4909647601465591</Translation>
+</Transform>
+<Instance name="EnsamblajeTubo15-1" uid="EnsamblajeTubo15-1" entityUid="EnsamblajeTubo15" rigid="true">
+<Transform>
+<Rotation>0 0 -1 -1.0000000000000002 0 0 0 0.99999999999999978 0</Rotation>
+<Translation>0.018932903952416147 0.00012840406110820046 0.07411567919970008</Translation>
+</Transform>
+<Instance name="Tubo15cm-1" uid="Tubo15cm-1" entityUid="Tubo15cm*:*Predeterminado">
+<Transform>
+<Rotation>0 0 0.99999999999999989 0 1 0 -0.99999999999999989 0 0</Rotation>
+<Translation>-0.00091585032948798828 -0.0048156791997001069 0.022999999999999993</Translation>
+</Transform>
+</Instance>
+<Instance name="BaseTubo-1" uid="BaseTubo-1" grounded="true" entityUid="BaseTubo*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.00091585032948798828 -0.0068156791997000532 0.022999999999999993</Translation>
+</Transform>
+</Instance>
+<Instance name="BaseTubo-2" uid="BaseTubo-2" entityUid="BaseTubo*:*Predeterminado">
+<Transform>
+<Rotation>-1.0000000000000002 0 0 0 -0.99999999999999978 0 0 0 1</Rotation>
+<Translation>-0.00091585032948804379 0.14718432080029978 0.022999999999999993</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="BPF-BU-1" uid="BPF-BU-1" entityUid="BPF-BU*:*Predeterminado">
+<Transform>
+<Rotation>0 -1 0 0.99999999999999989 0 0 0 0 0.99999999999999978</Rotation>
+<Translation>-0.022467096047583849 0.0010442543905961887 0.041299999999999976</Translation>
+</Transform>
+</Instance>
+<Instance name="BPF-WA-1" uid="BPF-WA-1" entityUid="BPF-WA*:*Predeterminado">
+<Transform>
+<Rotation>0 -1 0 0.99999999999999989 0 0 0 0 0.99999999999999978</Rotation>
+<Translation>-0.023167096047583845 0.0010442543905961887 0.041299999999999976</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F2-1" uid="FP04-F2-1" grounded="true" entityUid="FP04-F2*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.0040670960475838458 0.0010442543905961887 0.041299999999999976</Translation>
+</Transform>
+</Instance>
+</Instance>
+<Instance name="E1_1-1" uid="E1_1-1" entityUid="E1_1" rigid="true">
+<Transform>
+<Rotation>0.012116847353997134 -0.99992658831046188 0 -0.99992658831046188 -0.012116847353997134 -2.4887390524164508e-16 2.4782493849095755e-16 0 -1</Rotation>
+<Translation>-0.053191032447565088 -0.036895380790538147 0.3133199406571911</Translation>
+</Transform>
+<Instance name="AX-12A-04-1" uid="AX-12A-04-1" entityUid="AX-12A-04*:*Default">
+<Transform>
+<Rotation>0 0 1 -1 -1.6653345369377338e-16 0 1.6653345369377346e-16 -1 0</Rotation>
+<Translation>0.020175588639003275 0.0048915074085809224 0.041300000000000003</Translation>
+</Transform>
+</Instance>
+<Instance name="BPF-BU-1" uid="BPF-BU-1" entityUid="BPF-BU*:*Predeterminado">
+<Transform>
+<Rotation>0 -1 0 1 0 0 0 0 1</Rotation>
+<Translation>-0.019224411360996729 0.0048915074085809224 0.041300000000000003</Translation>
+</Transform>
+</Instance>
+<Instance name="BPF-WA-1" uid="BPF-WA-1" entityUid="BPF-WA*:*Predeterminado">
+<Transform>
+<Rotation>0 -1 0 1 0 0 0 0 1</Rotation>
+<Translation>-0.019924411360996725 0.0048915074085809224 0.041300000000000003</Translation>
+</Transform>
+</Instance>
+<Instance name="FP04-F2-1" uid="FP04-F2-1" grounded="true" entityUid="FP04-F2*:*Predeterminado">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>-0.00082441136099672269 0.0048915074085809224 0.041300000000000003</Translation>
+</Transform>
+</Instance>
+</Instance>
+</InstanceTree>
+<Constraints>
+<Concentric name="Concéntrica1">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Base1-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>E1_1-1</Uid>
+<Uid>FP04-F2-1</Uid>
+</InstancePath>
+<Position>0 0 0.026000000000000023</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincidente1">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base1-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>0 0.010999999999999996 -0.004500000000000004</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>E1_1-1</Uid>
+<Uid>FP04-F2-1</Uid>
+</InstancePath>
+<Position>-0.024000000000000007 0.012500000000000004 0.025999999999999995</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concéntrica2">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>E1_1-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>E2_2-1</Uid>
+<Uid>AX-12A_mov-1</Uid>
+<Uid>AX-12A-02-1</Uid>
+</InstancePath>
+<Position>0 0 0.00025000000000000022</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincidente2">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>E1_1-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>0 0.01100000000000001 -0.004500000000000004</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>E2_2-1</Uid>
+<Uid>AX-12A_mov-1</Uid>
+<Uid>AX-12A-02-1</Uid>
+</InstancePath>
+<Position>0 0 0.0027500000000000024</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concéntrica3">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>E2_2-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>E3_3-1</Uid>
+<Uid>FP04-F2-1</Uid>
+</InstancePath>
+<Position>0.024 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincidente3">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>E2_2-1</Uid>
+<Uid>AX-12A-04-1</Uid>
+</InstancePath>
+<Position>-1.1102230246251565e-16 0.0027500000000000163 0</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>E3_3-1</Uid>
+<Uid>FP04-F2-1</Uid>
+</InstancePath>
+<Position>0.020999999999999998 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+</Constraints>
+</RootAssembly>
+<Assemblies>
+<Assembly name="E2_2" uid="E2_2" version="127">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="E2_2.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+<Assembly name="AX-12A_mov" uid="AX-12A_mov" version="161">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="AX-12A_mov.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+<Assembly name="EnsamblajeTubo15" uid="EnsamblajeTubo15" version="115">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="EnsamblajeTubo15.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+<Assembly name="Base1" uid="Base1" version="163">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="Base1.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+<Assembly name="E3_3" uid="E3_3" version="113">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="E3_3.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+<Assembly name="E1_1" uid="E1_1" version="114">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<AssemblyFile name="E1_1.SLDASM" type="SolidWorks Assembly"/>
+</Assembly>
+</Assemblies>
+<Parts>
+<Part name="AX-12A-01" uid="AX-12A-01*:*Default" version="307">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="AX-12A-01.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.026741535345410773</Mass>
+<CenterOfMass>0.012533510873840206 0 0</CenterOfMass>
+<Inertia>2.535292172651401e-06 5.9975206477066133e-06 6.3756623024948778e-06 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="AX-12A-01_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Diffuse r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Specular r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.31</Shininess>
+</VisualProperties>
+</Part>
+<Part name="AX-12A-02" uid="AX-12A-02*:*Default" version="611">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="AX-12A-02.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0077003103010959521</Mass>
+<CenterOfMass>0.015036644500690165 -2.8730639577000702e-08 0.00066087654037424309</CenterOfMass>
+<Inertia>5.0374771094748777e-07 1.3096627468397852e-06 1.7487123341724493e-06 9.752508568090554e-14 -3.8221102772250693e-08 -9.8832545122751508e-12</Inertia>
+</MassProperties>
+<GeometryFile name="AX-12A-02_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Diffuse r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Specular r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.31</Shininess>
+</VisualProperties>
+</Part>
+<Part name="AX-12A-03" uid="AX-12A-03*:*Default" version="1016">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="AX-12A-03.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0065555652324972334</Mass>
+<CenterOfMass>0.013456634580457184 0 0.00027792477642013216</CenterOfMass>
+<Inertia>4.5227619658941618e-07 1.3326780723549407e-06 1.7459596771976575e-06 0 -5.497407380373969e-09 0</Inertia>
+</MassProperties>
+<GeometryFile name="AX-12A-03_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Diffuse r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Specular r="0.50196078431372548" g="0.50196078431372548" b="0.50196078431372548" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.31</Shininess>
+</VisualProperties>
+</Part>
+<Part name="AX-12A-04" uid="AX-12A-04*:*Default" version="331">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="AX-12A-04.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0015880991242806647</Mass>
+<CenterOfMass>0 0 -0.0022504014776025616</CenterOfMass>
+<Inertia>5.2664961617467404e-08 5.2664961617467397e-08 1.0010616497134765e-07 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="AX-12A-04_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.75294117647058822" g="0.75294117647058822" b="0.75294117647058822" a="1"/>
+<Diffuse r="0.75294117647058822" g="0.75294117647058822" b="0.75294117647058822" a="1"/>
+<Specular r="0.37647058823529411" g="0.37647058823529411" b="0.37647058823529411" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="BPF-BU" uid="BPF-BU*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="BPF-BU.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.00025536718276327104</Mass>
+<CenterOfMass>0 0.0039224919326032014 0</CenterOfMass>
+<Inertia>2.6757609749980939e-09 3.0758951970458798e-09 2.6757609749980695e-09 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="BPF-BU_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="BPF-WA" uid="BPF-WA*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="BPF-WA.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0001181829849867719</Mass>
+<CenterOfMass>0 0.00095 0</CenterOfMass>
+<Inertia>1.577859801485631e-09 3.0846128403375542e-09 1.5778598014856314e-09 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="BPF-WA_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="BaseTubo" uid="BaseTubo*:*Predeterminado" version="181">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="BaseTubo.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0013531147522271247</Mass>
+<CenterOfMass>1.0397299200991634e-10 0.0033957364998411263 1.2037702836761533e-09</CenterOfMass>
+<Inertia>4.7314300045184085e-08 6.1653299979806965e-08 4.6830070148151607e-08 -5.7605757215531758e-15 -8.611799180343475e-15 0</Inertia>
+</MassProperties>
+<GeometryFile name="BaseTubo_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="FP04-F2" uid="FP04-F2*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="FP04-F2.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.007291503615663812</Mass>
+<CenterOfMass>4.4315923061492215e-14 2.28486579376576e-06 0.015080112288169668</CenterOfMass>
+<Inertia>1.2258409973863213e-06 3.2356002341723507e-06 2.8766099911100694e-06 -1.5693633742216577e-10 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="FP04-F2_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="FP04-F3" uid="FP04-F3*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="FP04-F3.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0032063675233573283</Mass>
+<CenterOfMass>-1.7517355551094021e-05 0.0023973587524111066 0</CenterOfMass>
+<Inertia>4.7205201223994865e-07 6.5215039710295859e-07 2.0136634799241193e-07 0 0 1.28099219026112e-10</Inertia>
+</MassProperties>
+<GeometryFile name="FP04-F3_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="FP04-F53" uid="FP04-F53*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="FP04-F53.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0018091894767285352</Mass>
+<CenterOfMass>0 -0.0030749652011959 0</CenterOfMass>
+<Inertia>1.8178753843682186e-07 2.5786072342069345e-07 9.3481548126185414e-08 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="FP04-F53_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="FP04-F9" uid="FP04-F9*:*Predeterminado" version="118">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="FP04-F9.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0032071382272528923</Mass>
+<CenterOfMass>-0.0065553785733703795 -2.752796768606829e-09 -0.0092821686908628066</CenterOfMass>
+<Inertia>4.3702276526559518e-07 4.1727314957341035e-07 3.35048939771457e-07 -1.0644565767749764e-12 1.1903002345539405e-07 1.3944541876326191e-12</Inertia>
+</MassProperties>
+<GeometryFile name="FP04-F9_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Tubo15cm" uid="Tubo15cm*:*Predeterminado" version="141">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="Tubo15cm.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0014235646224373126</Mass>
+<CenterOfMass>1.0797473646094573e-09 0.074999999877364124 -1.5042927558985895e-05</CenterOfMass>
+<Inertia>2.675505907414515e-06 3.633624423729e-08 2.6756107552210036e-06 2.9628623405500504e-15 -7.425399781954819e-15 -6.2010577733790168e-14</Inertia>
+</MassProperties>
+<GeometryFile name="Tubo15cm_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="base1" uid="base1*:*Predeterminado" version="108">
+<ModelUnits mass="kilogram" length="centimeter"/>
+<PartFile name="base1.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.024979500000000002</Mass>
+<CenterOfMass>0 0.0024999999999999996 0</CenterOfMass>
+<Inertia>1.5233664809999997e-05 2.2305465341249994e-05 7.1758817812499993e-06 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="base1_Predeterminado_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+</Parts>
+</SimscapeMultibodyImportXML>

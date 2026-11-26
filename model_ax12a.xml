@@ -1,0 +1,175 @@
+<mujoco model="serial_3dof_robot_ax12a">
+  <compiler angle="radian" meshdir="meshes" autolimits="true"/>
+
+  <default>
+    <default class="serial_3dof_robot">
+      <joint type="hinge" axis="0 0 1" damping="0.24" armature="0.003" frictionloss="0.03"/>
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0" density="0" mass="0"/>
+      </default>
+      <default class="collision">
+        <geom group="3" type="mesh" contype="1" conaffinity="1" condim="4" friction="0.8 0.02 0.005" solref="0.005 1" solimp="0.95 0.99 0.001" rgba="0.20 0.75 0.35 0.45"/>
+      </default>
+    </default>
+  </default>
+
+  <asset>
+    <material name="dynamixel_body" rgba="0.20 0.21 0.23 1" metallic="0.1" roughness="0.55"/>
+    <material name="dynamixel_horn" rgba="0.72 0.74 0.76 1" metallic="0.25" roughness="0.45"/>
+    <material name="bracket_metal" rgba="0.72 0.76 0.86 1" metallic="0.35" roughness="0.38"/>
+    <material name="aluminum_tube" rgba="0.62 0.66 0.74 1" metallic="0.55" roughness="0.32"/>
+    <material name="base_plate" rgba="0.68 0.72 0.82 1" metallic="0.40" roughness="0.40"/>
+    <mesh name="ax_12a_01_vis" file="ax_12a_01.obj"/>
+    <mesh name="ax_12a_01_col" file="ax_12a_01.obj" maxhullvert="64"/>
+    <mesh name="ax_12a_02_vis" file="ax_12a_02.obj"/>
+    <mesh name="ax_12a_02_col" file="ax_12a_02.obj" maxhullvert="64"/>
+    <mesh name="ax_12a_03_vis" file="ax_12a_03.obj"/>
+    <mesh name="ax_12a_03_col" file="ax_12a_03.obj" maxhullvert="64"/>
+    <mesh name="ax_12a_04_vis" file="ax_12a_04.obj"/>
+    <mesh name="ax_12a_04_col" file="ax_12a_04.obj" maxhullvert="64"/>
+    <mesh name="base1_vis" file="base1.obj"/>
+    <mesh name="base1_col" file="base1.obj" maxhullvert="64"/>
+    <mesh name="basetubo_vis" file="basetubo.obj"/>
+    <mesh name="basetubo_col" file="basetubo.obj" maxhullvert="64"/>
+    <mesh name="bpf_bu_vis" file="bpf_bu.obj"/>
+    <mesh name="bpf_bu_col" file="bpf_bu.obj" maxhullvert="64"/>
+    <mesh name="bpf_wa_vis" file="bpf_wa.obj"/>
+    <mesh name="bpf_wa_col" file="bpf_wa.obj" maxhullvert="64"/>
+    <mesh name="fp04_f2_vis" file="fp04_f2.obj"/>
+    <mesh name="fp04_f2_col" file="fp04_f2.obj" maxhullvert="64"/>
+    <mesh name="fp04_f3_vis" file="fp04_f3.obj"/>
+    <mesh name="fp04_f3_col" file="fp04_f3.obj" maxhullvert="64"/>
+    <mesh name="fp04_f53_vis" file="fp04_f53.obj"/>
+    <mesh name="fp04_f53_col" file="fp04_f53.obj" maxhullvert="64"/>
+    <mesh name="fp04_f9_vis" file="fp04_f9.obj"/>
+    <mesh name="fp04_f9_col" file="fp04_f9.obj" maxhullvert="64"/>
+    <mesh name="tubo15cm_vis" file="tubo15cm.obj"/>
+    <mesh name="tubo15cm_col" file="tubo15cm.obj" maxhullvert="64"/>
+  </asset>
+
+  <worldbody>
+    <body name="serial_3dof_robot" childclass="serial_3dof_robot">
+      <inertial pos="-0.023741549 6.114632e-07 0.022365111" quat="0.94684496 -1.9325687e-05 -0.32169026 4.6106759e-05" mass="0.09223309569" diaginertia="4.2553954e-05 5.300185101e-05 6.682173818e-05"/>
+      <geom name="serial_3dof_robot_base1_1_vis" class="visual" mesh="base1_vis" material="base_plate" pos="-0.036 0 0" quat="0.70710678 0.70710678 0 0"/>
+      <geom name="serial_3dof_robot_base1_1_col" class="collision" mesh="base1_col" pos="-0.036 0 0" quat="0.70710678 0.70710678 0 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f53_2_vis" class="visual" mesh="fp04_f53_vis" material="bracket_metal" pos="-0.02275 -0.0315 0.0132" quat="0.5 0.5 0.5 0.5"/>
+      <geom name="serial_3dof_robot_fp04_f53_2_col" class="collision" mesh="fp04_f53_col" pos="-0.02275 -0.0315 0.0132" quat="0.5 0.5 0.5 0.5" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_ax_12a_04_1_vis" class="visual" mesh="ax_12a_04_vis" material="dynamixel_horn" pos="0 0 0.04845" quat="0 0.76914889 -0.63906963 0"/>
+      <geom name="serial_3dof_robot_ax_12a_04_1_col" class="collision" mesh="ax_12a_04_col" pos="0 0 0.04845" quat="0 0.76914889 -0.63906963 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f9_2_vis" class="visual" mesh="fp04_f9_vis" material="bracket_metal" pos="-0.02275 -0.019 0.0132" quat="0 0.70710678 0.70710678 0"/>
+      <geom name="serial_3dof_robot_fp04_f9_2_col" class="collision" mesh="fp04_f9_col" pos="-0.02275 -0.019 0.0132" quat="0 0.70710678 0.70710678 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f3_2_vis" class="visual" mesh="fp04_f3_vis" material="bracket_metal" pos="-0.02275 -0.019 0.0322" quat="1 0 0 0"/>
+      <geom name="serial_3dof_robot_fp04_f3_2_col" class="collision" mesh="fp04_f3_col" pos="-0.02275 -0.019 0.0322" quat="1 0 0 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_01_1_vis" class="visual" mesh="ax_12a_01_vis" material="dynamixel_body" pos="0 0 0.0322" quat="0 0 0 1"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_01_1_col" class="collision" mesh="ax_12a_01_col" pos="0 0 0.0322" quat="0 0 0 1" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_02_1_vis" class="visual" mesh="ax_12a_02_vis" material="dynamixel_body" pos="0 0 0.0457" quat="0 0 0 1"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_02_1_col" class="collision" mesh="ax_12a_02_col" pos="0 0 0.0457" quat="0 0 0 1" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_03_1_vis" class="visual" mesh="ax_12a_03_vis" material="dynamixel_body" pos="0 0 0.0187" quat="0 0 -1 0"/>
+      <geom name="serial_3dof_robot_ax_12a_mov_1_ax_12a_03_1_col" class="collision" mesh="ax_12a_03_col" pos="0 0 0.0187" quat="0 0 -1 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f53_3_vis" class="visual" mesh="fp04_f53_vis" material="bracket_metal" pos="-0.02275 0.0315 0.0132" quat="0.5 0.5 -0.5 -0.5"/>
+      <geom name="serial_3dof_robot_fp04_f53_3_col" class="collision" mesh="fp04_f53_col" pos="-0.02275 0.0315 0.0132" quat="0.5 0.5 -0.5 -0.5" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f9_3_vis" class="visual" mesh="fp04_f9_vis" material="bracket_metal" pos="-0.02275 0.019 0.0132" quat="0 0.70710678 -0.70710678 0"/>
+      <geom name="serial_3dof_robot_fp04_f9_3_col" class="collision" mesh="fp04_f9_col" pos="-0.02275 0.019 0.0132" quat="0 0.70710678 -0.70710678 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f3_3_vis" class="visual" mesh="fp04_f3_vis" material="bracket_metal" pos="-0.02275 0.019 0.0322" quat="0 0 0 1"/>
+      <geom name="serial_3dof_robot_fp04_f3_3_col" class="collision" mesh="fp04_f3_col" pos="-0.02275 0.019 0.0322" quat="0 0 0 1" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f9_1_vis" class="visual" mesh="fp04_f9_vis" material="bracket_metal" pos="-0.0415 0 0.0132" quat="0 1 0 0"/>
+      <geom name="serial_3dof_robot_fp04_f9_1_col" class="collision" mesh="fp04_f9_col" pos="-0.0415 0 0.0132" quat="0 1 0 0" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f3_1_vis" class="visual" mesh="fp04_f3_vis" material="bracket_metal" pos="-0.0415 0 0.0322" quat="0.70710678 0 0 -0.70710678"/>
+      <geom name="serial_3dof_robot_fp04_f3_1_col" class="collision" mesh="fp04_f3_col" pos="-0.0415 0 0.0322" quat="0.70710678 0 0 -0.70710678" rgba="0.20 0.75 0.35 0.45"/>
+      <geom name="serial_3dof_robot_fp04_f53_1_vis" class="visual" mesh="fp04_f53_vis" material="bracket_metal" pos="-0.054 0 0.0132" quat="0.70710678 0.70710678 0 0"/>
+      <geom name="serial_3dof_robot_fp04_f53_1_col" class="collision" mesh="fp04_f53_col" pos="-0.054 0 0.0132" quat="0.70710678 0.70710678 0 0" rgba="0.20 0.75 0.35 0.45"/>
+
+      <body name="link1" pos="0 0 0.04845" quat="0.70710678 0 0 -0.70710678">
+        <joint name="joint1" axis="0 0 1" range="-2.6179939 2.6179939"/>
+        <inertial pos="0.0023458188 -1.800479e-06 0.01861684" quat="0.70570946 0.7054963 -0.046091179 0.046094754" mass="0.009253152908" diaginertia="1.649790333e-06 3.649503234e-06 4.326176249e-06"/>
+        <geom name="link1_ax_12a_04_1_vis" class="visual" mesh="ax_12a_04_vis" material="dynamixel_horn" pos="0.021 0 0.0305" quat="0.5 0.5 0.5 0.5"/>
+        <geom name="link1_ax_12a_04_1_col" class="collision" mesh="ax_12a_04_col" pos="0.021 0 0.0305" quat="0.5 0.5 0.5 0.5" rgba="0.25 0.55 0.90 0.45"/>
+        <geom name="link1_bpf_bu_1_vis" class="visual" mesh="bpf_bu_vis" material="bracket_metal" pos="-0.0184 0 0.0305" quat="0 -0.70710678 0.70710678 0"/>
+        <geom name="link1_bpf_bu_1_col" class="collision" mesh="bpf_bu_col" pos="-0.0184 0 0.0305" quat="0 -0.70710678 0.70710678 0" rgba="0.25 0.55 0.90 0.45"/>
+        <geom name="link1_bpf_wa_1_vis" class="visual" mesh="bpf_wa_vis" material="bracket_metal" pos="-0.0191 0 0.0305" quat="0 -0.70710678 0.70710678 0"/>
+        <geom name="link1_bpf_wa_1_col" class="collision" mesh="bpf_wa_col" pos="-0.0191 0 0.0305" quat="0 -0.70710678 0.70710678 0" rgba="0.25 0.55 0.90 0.45"/>
+        <geom name="link1_fp04_f2_1_vis" class="visual" mesh="fp04_f2_vis" material="bracket_metal" pos="0 0 0.0305" quat="0 -1 0 0"/>
+        <geom name="link1_fp04_f2_1_col" class="collision" mesh="fp04_f2_col" pos="0 0 0.0305" quat="0 -1 0 0" rgba="0.25 0.55 0.90 0.45"/>
+
+        <body name="link2" pos="0.021 0 0.0305" quat="0.70710678 0 -0.70710678 0">
+          <joint name="joint2" axis="0 0 1" range="-1.5707963 1.5707963"/>
+          <inertial pos="0.12049935 9.6594046e-07 0.020040082" quat="0.70711128 0.70710028 0.0011888503 -0.0011890069" mass="0.09412545006" diaginertia="1.456124529e-05 0.001010118916 0.001014214974"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_01_1_vis" class="visual" mesh="ax_12a_01_vis" material="dynamixel_body" pos="0 0 0.02075" quat="0 1 0 0"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_01_1_col" class="collision" mesh="ax_12a_01_col" pos="0 0 0.02075" quat="0 1 0 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_02_1_vis" class="visual" mesh="ax_12a_02_vis" material="dynamixel_body" pos="0 0 0.00725" quat="0 1 0 0"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_02_1_col" class="collision" mesh="ax_12a_02_col" pos="0 0 0.00725" quat="0 1 0 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_03_1_vis" class="visual" mesh="ax_12a_03_vis" material="dynamixel_body" pos="0 0 0.03425" quat="1 0 0 0"/>
+          <geom name="link2_ax_12a_mov_1_ax_12a_03_1_col" class="collision" mesh="ax_12a_03_col" pos="0 0 0.03425" quat="1 0 0 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_fp04_f3_1_vis" class="visual" mesh="fp04_f3_vis" material="bracket_metal" pos="0.0415 0 0.02075" quat="0 0.70710678 -0.70710678 0"/>
+          <geom name="link2_fp04_f3_1_col" class="collision" mesh="fp04_f3_col" pos="0.0415 0 0.02075" quat="0 0.70710678 -0.70710678 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_01_1_vis" class="visual" mesh="ax_12a_01_vis" material="dynamixel_body" pos="0.237 0 0.02075" quat="0 0 -1 0"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_01_1_col" class="collision" mesh="ax_12a_01_col" pos="0.237 0 0.02075" quat="0 0 -1 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_02_1_vis" class="visual" mesh="ax_12a_02_vis" material="dynamixel_body" pos="0.237 0 0.00725" quat="0 0 -1 0"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_02_1_col" class="collision" mesh="ax_12a_02_col" pos="0.237 0 0.00725" quat="0 0 -1 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_03_1_vis" class="visual" mesh="ax_12a_03_vis" material="dynamixel_body" pos="0.237 0 0.03425" quat="0 0 0 -1"/>
+          <geom name="link2_ax_12a_mov_2_ax_12a_03_1_col" class="collision" mesh="ax_12a_03_col" pos="0.237 0 0.03425" quat="0 0 0 -1" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ax_12a_04_1_vis" class="visual" mesh="ax_12a_04_vis" material="dynamixel_horn" pos="0.237 0 0" quat="0 0.99738942 -0.07221045 0"/>
+          <geom name="link2_ax_12a_04_1_col" class="collision" mesh="ax_12a_04_col" pos="0.237 0 0" quat="0 0.99738942 -0.07221045 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ensamblajetubo15_1_tubo15cm_1_vis" class="visual" mesh="tubo15cm_vis" material="aluminum_tube" pos="0.0435 0 0.02075" quat="0.5 -0.5 -0.5 -0.5"/>
+          <geom name="link2_ensamblajetubo15_1_tubo15cm_1_col" class="collision" mesh="tubo15cm_col" pos="0.0435 0 0.02075" quat="0.5 -0.5 -0.5 -0.5" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ensamblajetubo15_1_basetubo_1_vis" class="visual" mesh="basetubo_vis" material="bracket_metal" pos="0.0415 0 0.02075" quat="0 0.70710678 0.70710678 0"/>
+          <geom name="link2_ensamblajetubo15_1_basetubo_1_col" class="collision" mesh="basetubo_col" pos="0.0415 0 0.02075" quat="0 0.70710678 0.70710678 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_ensamblajetubo15_1_basetubo_2_vis" class="visual" mesh="basetubo_vis" material="bracket_metal" pos="0.1955 0 0.02075" quat="0 -0.70710678 0.70710678 0"/>
+          <geom name="link2_ensamblajetubo15_1_basetubo_2_col" class="collision" mesh="basetubo_col" pos="0.1955 0 0.02075" quat="0 -0.70710678 0.70710678 0" rgba="0.95 0.55 0.15 0.45"/>
+          <geom name="link2_fp04_f3_2_vis" class="visual" mesh="fp04_f3_vis" material="bracket_metal" pos="0.1955 0 0.02075" quat="0.70710678 0 0 -0.70710678"/>
+          <geom name="link2_fp04_f3_2_col" class="collision" mesh="fp04_f3_col" pos="0.1955 0 0.02075" quat="0.70710678 0 0 -0.70710678" rgba="0.95 0.55 0.15 0.45"/>
+
+          <body name="link3" pos="0.237 0 0" quat="0.70710678 0 0 0.70710678">
+            <joint name="joint3" axis="0 0 1" range="-2.0943951 2.0943951"/>
+            <inertial pos="3.2280778e-06 -0.045386383 0.021684197" quat="0.49749782 0.50250108 -0.49749044 -0.50248567" mass="0.01179484791" diaginertia="3.206080635e-06 3.984072282e-05 4.201522222e-05"/>
+            <geom name="link3_ensamblajetubo15_1_tubo15cm_1_vis" class="visual" mesh="tubo15cm_vis" material="aluminum_tube" pos="0 -0.028 0.021" quat="0 -0.70710678 0 0.70710678"/>
+            <geom name="link3_ensamblajetubo15_1_tubo15cm_1_col" class="collision" mesh="tubo15cm_col" pos="0 -0.028 0.021" quat="0 -0.70710678 0 0.70710678" rgba="0.85 0.25 0.65 0.45"/>
+            <geom name="link3_ensamblajetubo15_1_basetubo_1_vis" class="visual" mesh="basetubo_vis" material="bracket_metal" pos="0 -0.026 0.021" quat="0 0 0 1"/>
+            <geom name="link3_ensamblajetubo15_1_basetubo_1_col" class="collision" mesh="basetubo_col" pos="0 -0.026 0.021" quat="0 0 0 1" rgba="0.85 0.25 0.65 0.45"/>
+            <geom name="link3_ensamblajetubo15_1_basetubo_2_vis" class="visual" mesh="basetubo_vis" material="bracket_metal" pos="0 -0.18 0.021" quat="1 0 0 0"/>
+            <geom name="link3_ensamblajetubo15_1_basetubo_2_col" class="collision" mesh="basetubo_col" pos="0 -0.18 0.021" quat="1 0 0 0" rgba="0.85 0.25 0.65 0.45"/>
+            <geom name="link3_bpf_bu_1_vis" class="visual" mesh="bpf_bu_vis" material="bracket_metal" pos="0 0 0.0394" quat="0.70710678 0.70710678 0 0"/>
+            <geom name="link3_bpf_bu_1_col" class="collision" mesh="bpf_bu_col" pos="0 0 0.0394" quat="0.70710678 0.70710678 0 0" rgba="0.85 0.25 0.65 0.45"/>
+            <geom name="link3_bpf_wa_1_vis" class="visual" mesh="bpf_wa_vis" material="bracket_metal" pos="0 0 0.0401" quat="0.70710678 0.70710678 0 0"/>
+            <geom name="link3_bpf_wa_1_col" class="collision" mesh="bpf_wa_col" pos="0 0 0.0401" quat="0.70710678 0.70710678 0 0" rgba="0.85 0.25 0.65 0.45"/>
+            <geom name="link3_fp04_f2_1_vis" class="visual" mesh="fp04_f2_vis" material="bracket_metal" pos="0 0 0.021" quat="0.5 0.5 0.5 -0.5"/>
+            <geom name="link3_fp04_f2_1_col" class="collision" mesh="fp04_f2_col" pos="0 0 0.021" quat="0.5 0.5 0.5 -0.5" rgba="0.85 0.25 0.65 0.45"/>
+            <site name="end_effector" group="4" type="sphere" size="0.008" pos="0 -0.18 0.021" quat="1 0 0 0" rgba="0.95 0.25 0.25 0.50"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude name="base_link1_exclude" body1="serial_3dof_robot" body2="link1"/>
+    <exclude name="link1_link2_exclude" body1="link1" body2="link2"/>
+    <exclude name="link2_link3_exclude" body1="link2" body2="link3"/>
+  </contact>
+
+  <actuator>
+    <!-- Dynamixel AX-12A Joint Mode position servos (12V: 1.5 N*m stall, ~59 RPM max) -->
+    <position name="pos_joint1" joint="joint1" kp="10" kv="0.25" ctrllimited="true" ctrlrange="-2.6179939 2.6179939" forcelimited="true" forcerange="-1.5 1.5"/>
+    <position name="pos_joint2" joint="joint2" kp="10" kv="0.25" ctrllimited="true" ctrlrange="-1.5707963 1.5707963" forcelimited="true" forcerange="-1.5 1.5"/>
+    <position name="pos_joint3" joint="joint3" kp="10" kv="0.25" ctrllimited="true" ctrlrange="-2.0943951 2.0943951" forcelimited="true" forcerange="-1.5 1.5"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="q1" joint="joint1"/>
+    <jointpos name="q2" joint="joint2"/>
+    <jointpos name="q3" joint="joint3"/>
+    <jointvel name="qd1" joint="joint1"/>
+    <jointvel name="qd2" joint="joint2"/>
+    <jointvel name="qd3" joint="joint3"/>
+    <actuatorfrc name="tau1" actuator="pos_joint1"/>
+    <actuatorfrc name="tau2" actuator="pos_joint2"/>
+    <actuatorfrc name="tau3" actuator="pos_joint3"/>
+    <framepos name="ee_pos" objtype="site" objname="end_effector"/>
+  </sensor>
+
+  <keyframe>
+    <key name="upright" qpos="0 0 0"/>
+    <key name="elbow_90" qpos="0 0 -1.5707963268"/>
+    <key name="cad_assembly" qpos="0.01211714 0.00780357 1.08561127"/>
+  </keyframe>
+</mujoco>
