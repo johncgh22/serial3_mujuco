@@ -97,7 +97,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run Physics-Informed SINDy identification on 3-DOF robot data.")
     parser.add_argument(
         "--scenario",
-        choices=["nominal", "perturbed"],
+        choices=["nominal", "mild", "perturbed"],
         default="perturbed",
         help="MuJoCo plant to identify (default: perturbed).",
     )
