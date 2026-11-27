@@ -1,0 +1,49 @@
+[System]
+Name='sugenotype1_serial3'
+Type='sugeno'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=9
+AndMethod='prod'
+OrMethod='probor'
+ImpMethod='prod'
+AggMethod='sum'
+DefuzzMethod='wtaver'
+
+[Input1]
+Name='entrada1'
+Range=[0 1]
+NumMFs=3
+MF1='negativo':'trimf',[-0.416666666666667 0 0.416666666666667]
+MF2='cero':'trimf',[0.0833333333333333 0.5 0.916666666666667]
+MF3='positivo':'trimf',[0.583333333333333 1 1.41666666666667]
+
+[Input2]
+Name='entrada2'
+Range=[0 1]
+NumMFs=3
+MF1='negativo':'trimf',[-0.416666666666667 0 0.416666666666667]
+MF2='cero':'trimf',[0.0833333333333333 0.5 0.916666666666667]
+MF3='positivo':'trimf',[0.583333333333333 1 1.41666666666667]
+
+[Output1]
+Name='salidas'
+Range=[0 1]
+NumMFs=5
+MF1='torquefuerte_negativo':'constant',[-10]
+MF2='torque_negativo':'constant',[-5]
+MF3='torque_cero':'constant',[0]
+MF4='torque_positivo':'constant',[5]
+MF5='torquefuerte_positivo':'constant',[10]
+
+[Rules]
+1 1, 1 (1) : 1
+2 1, 2 (1) : 1
+3 1, 3 (1) : 1
+1 2, 2 (1) : 1
+2 2, 3 (1) : 1
+3 2, 4 (1) : 1
+1 3, 3 (1) : 1
+2 3, 4 (1) : 1
+3 3, 5 (1) : 1
