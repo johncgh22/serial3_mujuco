@@ -19,3 +19,6 @@ build/
 *.asv
 *.slxc
 slprj/
+
+# MuJoCo runtime logs
+MUJOCO_LOG.TXT

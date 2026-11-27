@@ -27,11 +27,17 @@ class ComputedTorqueController(BaseController):
         kp: np.ndarray | list[float] = (320.0, 320.0, 320.0),
         kd: np.ndarray | list[float] = (36.0, 36.0, 36.0),
         torque_limit: float = 1.5,
+        name: str | None = None,
+        short_name: str | None = None,
     ):
         super().__init__(torque_limit=torque_limit)
         self.dyn = dynamics
         self.kp = np.asarray(kp, dtype=np.float64)
         self.kd = np.asarray(kd, dtype=np.float64)
+        if name is not None:
+            self.name = name
+        if short_name is not None:
+            self.short_name = short_name
 
     def compute(
         self,

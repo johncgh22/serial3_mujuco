@@ -39,14 +39,18 @@ from controllers import (
     CartesianCircleTrajectory,
     CartesianImpedanceController,
     ComputedTorqueController,
+    LTVMPCController,
     OperationalSpaceController,
     PDGravityController,
     PIDController,
+    SINDyDynamics,
     SlidingModeController,
     SlotineLiAdaptiveController,
     SmoothJointTrajectory,
     SugenoFuzzyController,
     SuperTwistingSMC,
+    collect_mujoco_excitation,
+    fit_sindy_model,
 )
 
 HERE = Path(__file__).resolve().parent
@@ -163,9 +167,13 @@ def build_sim_model(scenario: str, with_target_marker: bool = False) -> mujoco.M
     return spec.compile()
 
 
-def make_controllers(dyn: AnalyticalDynamics) -> dict[str, BaseController]:
-    """Instantiate the full controller suite with nominal CAD_PARAMS."""
-    return {
+def make_controllers(
+    dyn: AnalyticalDynamics,
+    trajectory_fn=None,
+    sindy_dyn: SINDyDynamics | None = None,
+) -> dict[str, BaseController]:
+    """Instantiate the full controller suite (nominal analytical + optional SINDy models)."""
+    ctrls: dict[str, BaseController] = {
         "pid": PIDController(),
         "pdg": PDGravityController(dyn),
         "ctc": ComputedTorqueController(dyn),
@@ -175,7 +183,30 @@ def make_controllers(dyn: AnalyticalDynamics) -> dict[str, BaseController]:
         "fuzzy": SugenoFuzzyController(dyn),
         "osc": OperationalSpaceController(dyn),
         "impedance": CartesianImpedanceController(dyn),
+        "mpc": LTVMPCController(
+            dyn,
+            trajectory_fn=trajectory_fn,
+            use_disturbance_observer=False,
+            name="LTV-MPC (Nominal)",
+            short_name="MPC",
+        ),
     }
+    if sindy_dyn is not None:
+        ctrls["sindy_ctc"] = ComputedTorqueController(
+            sindy_dyn,
+            kp=(260.0, 260.0, 260.0),
+            kd=(32.0, 32.0, 32.0),
+            name="SINDy + CTC",
+            short_name="SINDy-CTC",
+        )
+        ctrls["sindy_mpc"] = LTVMPCController(
+            sindy_dyn,
+            trajectory_fn=trajectory_fn,
+            use_disturbance_observer=True,
+            name="SINDy-MPC (DOB)",
+            short_name="SINDy-MPC",
+        )
+    return ctrls
 
 
 def simulate_controller(
@@ -292,7 +323,7 @@ def plot_scenario(results: list[SimResult], title: str, out_path: Path, perturbe
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    colors = plt.cm.tab10(np.linspace(0, 0.9, len(results)))
+    colors = plt.cm.tab20(np.linspace(0, 0.95, len(results)))
     nrows = 3 if not perturbed else 4
     fig, axes = plt.subplots(nrows, 1, figsize=(11, 3.0 * nrows), sharex=True)
 
@@ -402,7 +433,7 @@ def plot_cartesian_circle(results_nom: list[SimResult], results_pert: list[SimRe
     import matplotlib.pyplot as plt
 
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 5.0))
-    colors = ["#2563eb", "#16a34a", "#ea580c", "#9333ea"]
+    colors = ["#2563eb", "#16a34a", "#ea580c", "#9333ea", "#dc2626"]
 
     for ax, res_list, subtitle in (
         (axes[0], results_nom, "Nominal Plant (Y-Z Plane Projection)"),
@@ -431,14 +462,23 @@ def run_viewer(controller_key: str, scenario: str, trajectory_kind: str) -> None
     import mujoco.viewer
 
     dyn = AnalyticalDynamics(CAD_PARAMS)
-    controllers = make_controllers(dyn)
+    traj = SmoothJointTrajectory(dyn) if trajectory_kind == "joint" else CartesianCircleTrajectory(dyn)
+    model = build_sim_model(scenario, with_target_marker=True)
+
+    sindy_dyn = None
+    if controller_key in ("sindy_ctc", "sindy_mpc"):
+        print(f"Identifying SINDy model on {scenario} plant before launching viewer...")
+        id_model = build_sim_model(scenario)
+        exc = collect_mujoco_excitation(id_model, duration=12.0, subsample=5)
+        sindy_dyn, metrics = fit_sindy_model(exc["q"], exc["qd"], exc["qdd"], exc["tau"])
+        print(f"SINDy identified ({metrics['n_terms_active']} terms, R²={metrics['r2_mean']:.5f}).")
+
+    controllers = make_controllers(dyn, trajectory_fn=traj, sindy_dyn=sindy_dyn)
     if controller_key not in controllers:
         raise ValueError(f"Unknown controller {controller_key!r}. Choose from: {list(controllers)}")
     ctrl = controllers[controller_key]
     ctrl.reset()
 
-    traj = SmoothJointTrajectory(dyn) if trajectory_kind == "joint" else CartesianCircleTrajectory(dyn)
-    model = build_sim_model(scenario, with_target_marker=True)
     data = mujoco.MjData(model)
 
     q0, qd0 = traj.initial_state()
@@ -485,15 +525,25 @@ def run_benchmark(duration: float = 6.0) -> None:
     model_nom = build_sim_model("nominal")
     model_pert = build_sim_model("perturbed")
 
-    # 1. Nominal joint-space + OSC benchmark
+    # Identify Physics-Informed SINDy models from short 12s excitation rollouts
+    print("Running Physics-Informed SINDy identification on nominal & perturbed plants...")
+    exc_nom = collect_mujoco_excitation(model_nom, duration=12.0, subsample=5)
+    sindy_nom, m_nom = fit_sindy_model(exc_nom["q"], exc_nom["qd"], exc_nom["qdd"], exc_nom["tau"])
+    print(f"  [SINDy Nominal]   active={m_nom['n_terms_active']}/{m_nom['n_terms_total']}, R²={m_nom['r2_mean']:.5f}")
+
+    exc_pert = collect_mujoco_excitation(model_pert, duration=12.0, subsample=5)
+    sindy_pert, m_pert = fit_sindy_model(exc_pert["q"], exc_pert["qd"], exc_pert["qdd"], exc_pert["tau"])
+    print(f"  [SINDy Perturbed] active={m_pert['n_terms_active']}/{m_pert['n_terms_total']}, R²={m_pert['r2_mean']:.5f}")
+
+    # 1. Nominal joint-space + OSC + MPC + SINDy benchmark
     nom_results: list[SimResult] = []
-    for key, ctrl in make_controllers(dyn).items():
+    for key, ctrl in make_controllers(dyn, trajectory_fn=joint_traj, sindy_dyn=sindy_nom).items():
         nom_results.append(simulate_controller(key, ctrl, model_nom, joint_traj, duration=duration, apply_disturbance=False))
     print_table("BENCHMARK 1: NOMINAL PLANT (scene.xml, exact CAD, zero friction)", nom_results)
 
     # 2. Perturbed / Sim-to-Real benchmark (+100 g payload, +25% link2 mass, AX-12A friction, impulse disturbance)
     pert_results: list[SimResult] = []
-    for key, ctrl in make_controllers(dyn).items():
+    for key, ctrl in make_controllers(dyn, trajectory_fn=joint_traj, sindy_dyn=sindy_pert).items():
         pert_results.append(simulate_controller(key, ctrl, model_pert, joint_traj, duration=duration, apply_disturbance=True))
     print_table(
         "BENCHMARK 2: PERTURBED / SIM-TO-REAL (+100g payload, +25% m2, AX-12A friction, impulse @2.5s)",
@@ -501,14 +551,14 @@ def run_benchmark(duration: float = 6.0) -> None:
     )
 
     # 3. Direct 3D Cartesian Circle benchmark
-    circle_keys = ("osc", "impedance", "ctc", "st_smc")
+    circle_keys = ("osc", "impedance", "ctc", "st_smc", "sindy_mpc")
     circle_nom: list[SimResult] = []
     circle_pert: list[SimResult] = []
+    nom_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_nom)
+    pert_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_pert)
     for key in circle_keys:
-        ctrl_n = make_controllers(dyn)[key]
-        ctrl_p = make_controllers(dyn)[key]
-        circle_nom.append(simulate_controller(key, ctrl_n, model_nom, circle_traj, duration=duration, apply_disturbance=False))
-        circle_pert.append(simulate_controller(key, ctrl_p, model_pert, circle_traj, duration=duration, apply_disturbance=False))
+        circle_nom.append(simulate_controller(key, nom_ctrls_c[key], model_nom, circle_traj, duration=duration, apply_disturbance=False))
+        circle_pert.append(simulate_controller(key, pert_ctrls_c[key], model_pert, circle_traj, duration=duration, apply_disturbance=False))
     print_table("BENCHMARK 3A: 3D CARTESIAN CIRCLE (Nominal)", circle_nom)
     print_table("BENCHMARK 3B: 3D CARTESIAN CIRCLE (Perturbed +100g + AX-12A friction)", circle_pert)
 
@@ -534,9 +584,9 @@ def main() -> None:
     parser.add_argument("--viewer", action="store_true", help="Launch interactive 3D MuJoCo viewer instead of headless benchmark.")
     parser.add_argument(
         "--controller",
-        default="st_smc",
-        choices=["pid", "pdg", "ctc", "adaptive", "smc", "st_smc", "fuzzy", "osc", "impedance"],
-        help="Controller to run in --viewer mode (default: st_smc).",
+        default="sindy_mpc",
+        choices=["pid", "pdg", "ctc", "adaptive", "smc", "st_smc", "fuzzy", "osc", "impedance", "mpc", "sindy_ctc", "sindy_mpc"],
+        help="Controller to run in --viewer mode (default: sindy_mpc).",
     )
     parser.add_argument(
         "--scenario",

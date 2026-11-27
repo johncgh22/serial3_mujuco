@@ -227,6 +227,18 @@ class AnalyticalDynamics:
             + self.gravity_vector(q, theta)
         )
 
+    def forward_dynamics(
+        self,
+        q: np.ndarray,
+        qd: np.ndarray,
+        tau: np.ndarray,
+        theta: np.ndarray | None = None,
+    ) -> np.ndarray:
+        """Compute joint accelerations qdd = M(q)^-1 * (tau - C(q,qd)*qd - G(q)) [rad/s^2]."""
+        M = self.mass_matrix(q, theta)
+        b = self.coriolis_matrix(q, qd, theta) @ qd + self.gravity_vector(q, theta)
+        return np.linalg.solve(M, tau - b)
+
     def regressor(
         self,
         q: np.ndarray,
