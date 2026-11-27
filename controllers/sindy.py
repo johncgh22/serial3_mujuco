@@ -208,16 +208,36 @@ class SINDyDynamics:
         self.min_inertia = float(min_inertia)
         self.coulomb_eps = float(coulomb_eps)
 
-        # Pre-filter active terms for fast single-state evaluation in MPC loops
-        self._active_accel: list[tuple[CandidateTerm, np.ndarray]] = []
-        self._active_bias: list[tuple[CandidateTerm, np.ndarray]] = []
+        # Pre-filter active terms and pack their coefficients into dense tensors so
+        # M_hat and b_hat are evaluated for a whole batch of states with one
+        # einsum / matmul (MPC linearization queries ~100 states per solve).
+        accel_terms: list[CandidateTerm] = []
+        bias_terms: list[CandidateTerm] = []
+        accel_coefs: list[np.ndarray] = []
+        bias_coefs: list[np.ndarray] = []
         for j, term in enumerate(terms):
             coeffs = self.Xi[j, :]
             if np.any(np.abs(coeffs) > 1e-12):
                 if term.kind == "accel":
-                    self._active_accel.append((term, coeffs))
+                    accel_terms.append(term)
+                    accel_coefs.append(coeffs)
                 else:
-                    self._active_bias.append((term, coeffs))
+                    bias_terms.append(term)
+                    bias_coefs.append(coeffs)
+        self._accel_terms = accel_terms
+        self._bias_terms = bias_terms
+
+        # M_hat[i, accel_idx] += Xi[j, i] * phi_j(q)  ->  M = einsum("bk,ijk->bij", Phi, M_coef)
+        self._M_coef = np.zeros((3, 3, len(accel_terms)), dtype=np.float64)
+        for k, (term, coeffs) in enumerate(zip(accel_terms, accel_coefs)):
+            self._M_coef[:, term.accel_idx, k] = coeffs
+        # b_hat = Phi_bias @ B_coef
+        self._B_coef = (
+            np.asarray(bias_coefs, dtype=np.float64)
+            if bias_coefs
+            else np.zeros((0, 3), dtype=np.float64)
+        )
+        self._I_floor = self.min_inertia * np.eye(3)
 
     @property
     def n_nonzero(self) -> int:
@@ -239,31 +259,56 @@ class SINDyDynamics:
                 lines.append("    0")
         return "\n".join(lines)
 
+    # ---- Batched evaluation: q, qd, qdd, tau of shape (B, 3) ----
+    def mass_matrix_batch(self, q: np.ndarray) -> np.ndarray:
+        """Reconstruct inertia matrices M_hat(q) for a batch of states -> (B, 3, 3)."""
+        q = np.atleast_2d(q)
+        if self._accel_terms:
+            phi = np.column_stack([term.basis_fn(q) for term in self._accel_terms])
+            M = np.einsum("bk,ijk->bij", phi, self._M_coef)
+        else:
+            M = np.zeros((len(q), 3, 3), dtype=np.float64)
+        # Enforce symmetry and minimum positive-definite inertia floor
+        M = 0.5 * (M + np.swapaxes(M, -1, -2))
+        try:
+            # Fast path: Cholesky of (M - floor*I) succeeds iff every eigenvalue
+            # exceeds the floor, so the eigen-decomposition is skipped.
+            np.linalg.cholesky(M - self._I_floor)
+            return M
+        except np.linalg.LinAlgError:
+            pass
+        eigvals, eigvecs = np.linalg.eigh(M)
+        bad = np.any(eigvals < self.min_inertia, axis=1)
+        if np.any(bad):
+            w = np.maximum(eigvals[bad], self.min_inertia)
+            V = eigvecs[bad]
+            M[bad] = (V * w[:, None, :]) @ np.swapaxes(V, -1, -2)
+        return M
+
+    def bias_vector_batch(self, q: np.ndarray, qd: np.ndarray) -> np.ndarray:
+        """Reconstruct Coriolis + gravity + friction vectors b_hat(q, qd) -> (B, 3)."""
+        q = np.atleast_2d(q)
+        qd = np.atleast_2d(qd)
+        if not self._bias_terms:
+            return np.zeros((len(q), 3), dtype=np.float64)
+        qdd_zero = np.zeros_like(q)
+        phi = np.column_stack([term.eval_fn(q, qd, qdd_zero) for term in self._bias_terms])
+        return phi @ self._B_coef
+
+    def forward_dynamics_batch(self, q: np.ndarray, qd: np.ndarray, tau: np.ndarray) -> np.ndarray:
+        """Batched qdd = M_hat(q)^-1 * (tau - b_hat(q, qd)) -> (B, 3)."""
+        M = self.mass_matrix_batch(q)
+        rhs = np.atleast_2d(tau) - self.bias_vector_batch(q, qd)
+        return np.linalg.solve(M, rhs[..., None])[..., 0]
+
+    # ---- Single-state API ----
     def mass_matrix(self, q: np.ndarray) -> np.ndarray:
         """Reconstruct 3x3 inertia matrix M_hat(q) from active acceleration terms."""
-        q_2d = np.atleast_2d(q)
-        M = np.zeros((3, 3), dtype=np.float64)
-        for term, coeffs in self._active_accel:
-            val = float(term.basis_fn(q_2d)[0])
-            M[:, term.accel_idx] += coeffs * val
-        # Enforce symmetry and minimum positive-definite inertia floor
-        M = 0.5 * (M + M.T)
-        eigvals, eigvecs = np.linalg.eigh(M)
-        if np.any(eigvals < self.min_inertia):
-            eigvals = np.maximum(eigvals, self.min_inertia)
-            M = (eigvecs * eigvals) @ eigvecs.T
-        return M
+        return self.mass_matrix_batch(q)[0]
 
     def bias_vector(self, q: np.ndarray, qd: np.ndarray) -> np.ndarray:
         """Reconstruct combined Coriolis + gravity + friction vector b_hat(q, qd)."""
-        q_2d = np.atleast_2d(q)
-        qd_2d = np.atleast_2d(qd)
-        qdd_zero = np.zeros_like(q_2d)
-        b = np.zeros(3, dtype=np.float64)
-        for term, coeffs in self._active_bias:
-            val = float(term.eval_fn(q_2d, qd_2d, qdd_zero)[0])
-            b += coeffs * val
-        return b
+        return self.bias_vector_batch(q, qd)[0]
 
     def inverse_dynamics(self, q: np.ndarray, qd: np.ndarray, qdd: np.ndarray) -> np.ndarray:
         """Predict joint torques tau = M_hat(q)*qdd + b_hat(q, qd)."""
@@ -271,9 +316,7 @@ class SINDyDynamics:
 
     def forward_dynamics(self, q: np.ndarray, qd: np.ndarray, tau: np.ndarray) -> np.ndarray:
         """Predict joint accelerations qdd = M_hat(q)^-1 * (tau - b_hat(q, qd))."""
-        M = self.mass_matrix(q)
-        b = self.bias_vector(q, qd)
-        return np.linalg.solve(M, tau - b)
+        return self.forward_dynamics_batch(q, qd, tau)[0]
 
 
 def fit_sindy_model(
