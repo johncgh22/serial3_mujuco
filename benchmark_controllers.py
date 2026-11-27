@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 """Benchmark & interactive viewer for 3-DOF serial robot controllers in MuJoCo.
 
-Evaluates all controllers in `controllers/` head-to-head across three tests:
+Evaluates all controllers in `controllers/` head-to-head across four tests:
   1. Nominal (`scene.xml` — exact CAD masses, zero gearbox friction):
        Smooth 3-DOF trajectory away from overhead singularity.
-  2. Perturbed / Sim-to-Real (via MjSpec):
-       +100 g unknown end-effector payload, +25% link2 mass mismatch,
-       AX-12A 254:1 gearbox dynamics (armature=0.003, damping=0.24,
+  2. Mild mismatch (via MjSpec):
+       +5 g end-effector payload, +10% link2 mass, and 10% of the AX-12A
+       gearbox values (armature=0.0003, damping=0.024, frictionloss=0.003),
+       no impulse. Shows where nominal-model controllers start to break down.
+  3. Perturbed / Sim-to-Real (via MjSpec):
+       +100 g unknown end-effector payload (~8.5x link3's mass), +25% link2 mass
+       mismatch, AX-12A 254:1 gearbox dynamics (armature=0.003, damping=0.24,
        frictionloss=0.03), +/-1.5 N*m torque limits, and an external torque
        impulse disturbance at t = 2.5..2.8 s.
-  3. Cartesian 3D Circle:
+  4. Cartesian 3D Circle:
        Direct end-effector circle tracking comparing OSC, Cartesian Impedance,
-       CTC, and Super-Twisting SMC.
+       CTC, Super-Twisting SMC, and SINDy-MPC.
+
+Both MPC variants are run with and without the disturbance observer (DOB) so
+the effect of the prediction model and the DOB can be separated.
 
 Examples:
   # Run the full headless benchmark and generate comparison plots:
@@ -61,6 +68,40 @@ RENDER_DIR = HERE / "renders"
 DISTURBANCE_T_START = 2.5
 DISTURBANCE_T_END = 2.8
 DISTURBANCE_TORQUE = np.array([0.12, -0.20, 0.08], dtype=np.float64)
+
+
+@dataclass(frozen=True)
+class PlantPerturbation:
+    """Unmodeled plant changes applied on top of `scene.xml` (zeros = nominal CAD plant)."""
+    payload_mass: float = 0.0        # [kg] sphere at the link3 tip, invisible to nominal models
+    link2_mass_scale: float = 1.0    # multiplies link2 mass and inertia
+    armature: float = 0.0            # [kg*m^2] per joint (gearbox reflected inertia)
+    damping: float = 0.0             # [N*m*s/rad] per joint viscous friction
+    frictionloss: float = 0.0        # [N*m] per joint Coulomb friction
+    impulse: bool = False            # apply DISTURBANCE_TORQUE during [T_START, T_END]
+
+
+SCENARIOS: dict[str, PlantPerturbation] = {
+    "nominal": PlantPerturbation(),
+    # Small mismatch on every axis (e.g. a sensor/cable taped to the tip). Nominal
+    # CTC/OSC/MPC are very sensitive to tip payload because the bare elbow inertia
+    # (M33 ~ 6.4e-5 kg*m^2) makes their effective stiffness M33*Kp tiny.
+    "mild": PlantPerturbation(
+        payload_mass=0.005,
+        link2_mass_scale=1.10,
+        armature=0.0003,
+        damping=0.024,
+        frictionloss=0.003,
+    ),
+    "perturbed": PlantPerturbation(
+        payload_mass=0.100,
+        link2_mass_scale=1.25,
+        armature=0.003,
+        damping=0.24,
+        frictionloss=0.03,
+        impulse=True,
+    ),
+}
 
 
 @dataclass
@@ -121,36 +162,39 @@ def verify_analytical_core(dyn: AnalyticalDynamics) -> None:
 
 
 def build_sim_model(scenario: str, with_target_marker: bool = False) -> mujoco.MjModel:
-    """Build either the nominal or perturbed/AX-12A MuJoCo plant via MjSpec."""
+    """Build a MuJoCo plant for one of `SCENARIOS` (nominal, mild, perturbed) via MjSpec."""
+    if scenario not in SCENARIOS:
+        raise ValueError(f"Unknown scenario: {scenario!r}. Choose from: {list(SCENARIOS)}")
+    pert = SCENARIOS[scenario]
     spec = mujoco.MjSpec.from_file(str(SCENE_XML))
 
-    if scenario == "perturbed":
-        # 1. Add AX-12A 254:1 gearbox armature, viscous damping, and Coulomb friction
+    # 1. AX-12A 254:1 gearbox armature, viscous damping, and Coulomb friction
+    if pert.armature or pert.damping or pert.frictionloss:
         for jname in ("joint1", "joint2", "joint3"):
             jnt = spec.joint(jname)
-            jnt.armature = 0.003
-            jnt.damping = [0.24, 0.0, 0.0]
-            jnt.frictionloss = 0.03
+            jnt.armature = pert.armature
+            jnt.damping = [pert.damping, 0.0, 0.0]
+            jnt.frictionloss = pert.frictionloss
 
-        # 2. +25% unmodeled mass & inertia mismatch on link2
+    # 2. Unmodeled mass & inertia mismatch on link2
+    if pert.link2_mass_scale != 1.0:
         link2 = spec.body("link2")
-        link2.mass = float(link2.mass) * 1.25
-        link2.inertia = np.asarray(link2.inertia, dtype=np.float64) * 1.25
+        link2.mass = float(link2.mass) * pert.link2_mass_scale
+        link2.inertia = np.asarray(link2.inertia, dtype=np.float64) * pert.link2_mass_scale
 
-        # 3. Unknown +100 g payload attached at the end-effector tip of link3
+    # 3. Unknown payload attached at the end-effector tip of link3
+    if pert.payload_mass > 0.0:
         link3 = spec.body("link3")
         payload = link3.add_body(name="unknown_payload", pos=[0.0, -0.18, 0.021])
         payload.add_geom(
             name="unknown_payload_geom",
             type=mujoco.mjtGeom.mjGEOM_SPHERE,
             size=[0.022, 0.0, 0.0],
-            mass=0.100,
+            mass=pert.payload_mass,
             contype=0,
             conaffinity=0,
             rgba=[0.92, 0.25, 0.18, 0.90],
         )
-    elif scenario != "nominal":
-        raise ValueError(f"Unknown scenario: {scenario!r}")
 
     if with_target_marker:
         # Mocap sphere showing live desired end-effector position in viewer mode
@@ -190,6 +234,13 @@ def make_controllers(
             name="LTV-MPC (Nominal)",
             short_name="MPC",
         ),
+        "mpc_dob": LTVMPCController(
+            dyn,
+            trajectory_fn=trajectory_fn,
+            use_disturbance_observer=True,
+            name="LTV-MPC (Nominal + DOB)",
+            short_name="MPC+DOB",
+        ),
     }
     if sindy_dyn is not None:
         ctrls["sindy_ctc"] = ComputedTorqueController(
@@ -199,12 +250,19 @@ def make_controllers(
             name="SINDy + CTC",
             short_name="SINDy-CTC",
         )
+        ctrls["sindy_mpc_nodob"] = LTVMPCController(
+            sindy_dyn,
+            trajectory_fn=trajectory_fn,
+            use_disturbance_observer=False,
+            name="SINDy-MPC (no DOB)",
+            short_name="SINDy-MPC",
+        )
         ctrls["sindy_mpc"] = LTVMPCController(
             sindy_dyn,
             trajectory_fn=trajectory_fn,
             use_disturbance_observer=True,
             name="SINDy-MPC (DOB)",
-            short_name="SINDy-MPC",
+            short_name="SINDy-MPC+DOB",
         )
     return ctrls
 
@@ -383,44 +441,47 @@ def plot_scenario(results: list[SimResult], title: str, out_path: Path, perturbe
     print(f"Saved plot: {out_path}")
 
 
-def plot_summary_bars(nom: list[SimResult], pert: list[SimResult], out_path: Path) -> None:
+SCENARIO_STYLE = {
+    "nominal": ("Nominal", "#3b82f6"),
+    "mild": ("Mild (+5 g, +10% m2, 10% gearbox)", "#f59e0b"),
+    "perturbed": ("Perturbed (+100 g + AX-12A + impulse)", "#ef4444"),
+}
+
+
+def plot_summary_bars(results: dict[str, list[SimResult]], out_path: Path) -> None:
+    """Grouped bars per controller, one bar per scenario in `results` (keys of SCENARIO_STYLE)."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    labels = [r.short_name for r in nom]
+    scen_keys = list(results)
+    labels = [r.short_name for r in results[scen_keys[0]]]
     x = np.arange(len(labels))
-    w = 0.38
+    w = 0.8 / len(scen_keys)
+    offsets = (np.arange(len(scen_keys)) - (len(scen_keys) - 1) / 2) * w
 
-    fig, axes = plt.subplots(1, 3, figsize=(14.5, 4.6))
+    fig, axes = plt.subplots(1, 3, figsize=(16, 4.8))
+    panels = (
+        ("ee_rmse_mm", "End-Effector 3D RMSE [mm] (log, lower = better)", "RMSE [mm]"),
+        ("ee_steady_rmse_mm", "Steady-State EE RMSE (Last 2 s) [mm] (log)", "RMSE [mm]"),
+        ("effort_int_tau2", "Control Energy ∫‖τ‖² dt [N²·m²·s]", "Effort [N²·m²·s]"),
+    )
+    for ax, (attr, title, ylabel) in zip(axes, panels):
+        for off, key in zip(offsets, scen_keys):
+            label, color = SCENARIO_STYLE[key]
+            ax.bar(x + off, [getattr(r, attr) for r in results[key]], w, label=label, color=color)
+        ax.set_title(title)
+        ax.set_ylabel(ylabel)
+        ax.set_xticks(x, labels, rotation=38, ha="right")
+        ax.grid(True, axis="y", alpha=0.3)
+        if attr != "effort_int_tau2":
+            # Errors span ~0.1 mm to ~300 mm across scenarios
+            ax.set_yscale("log")
+    handles, leg_labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, leg_labels, loc="upper center", bbox_to_anchor=(0.5, 0.94), ncol=len(scen_keys), fontsize=9)
 
-    # 1. End-effector RMSE (mm)
-    axes[0].bar(x - w / 2, [r.ee_rmse_mm for r in nom], w, label="Nominal", color="#3b82f6")
-    axes[0].bar(x + w / 2, [r.ee_rmse_mm for r in pert], w, label="Perturbed (+100g + AX-12A)", color="#ef4444")
-    axes[0].set_title("End-Effector 3D RMSE [mm] (lower = better)")
-    axes[0].set_ylabel("RMSE [mm]")
-    axes[0].set_xticks(x, labels, rotation=32, ha="right")
-    axes[0].grid(True, axis="y", alpha=0.3)
-    axes[0].legend(fontsize=8)
-
-    # 2. Steady-state (last 2s) EE RMSE (mm)
-    axes[1].bar(x - w / 2, [r.ee_steady_rmse_mm for r in nom], w, label="Nominal", color="#3b82f6")
-    axes[1].bar(x + w / 2, [r.ee_steady_rmse_mm for r in pert], w, label="Perturbed (last 2s)", color="#ef4444")
-    axes[1].set_title("Steady-State EE RMSE (Last 2 s) [mm]")
-    axes[1].set_ylabel("RMSE [mm]")
-    axes[1].set_xticks(x, labels, rotation=32, ha="right")
-    axes[1].grid(True, axis="y", alpha=0.3)
-
-    # 3. Control effort integral ||tau||^2 dt
-    axes[2].bar(x - w / 2, [r.effort_int_tau2 for r in nom], w, label="Nominal", color="#3b82f6")
-    axes[2].bar(x + w / 2, [r.effort_int_tau2 for r in pert], w, label="Perturbed", color="#ef4444")
-    axes[2].set_title("Control Energy ∫‖τ‖² dt [N²·m²·s]")
-    axes[2].set_ylabel("Effort [N²·m²·s]")
-    axes[2].set_xticks(x, labels, rotation=32, ha="right")
-    axes[2].grid(True, axis="y", alpha=0.3)
-
-    fig.suptitle("3-DOF Serial Robot Controller Benchmark: Nominal vs. Sim-to-Real Perturbed", fontsize=12)
-    fig.tight_layout()
+    fig.suptitle("3-DOF Serial Robot Controller Benchmark: Nominal vs. Mild vs. Sim-to-Real Perturbed", fontsize=12)
+    fig.tight_layout(rect=(0, 0, 1, 0.89))
     out_path.parent.mkdir(exist_ok=True)
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
@@ -466,7 +527,7 @@ def run_viewer(controller_key: str, scenario: str, trajectory_kind: str) -> None
     model = build_sim_model(scenario, with_target_marker=True)
 
     sindy_dyn = None
-    if controller_key in ("sindy_ctc", "sindy_mpc"):
+    if controller_key.startswith("sindy_"):
         print(f"Identifying SINDy model on {scenario} plant before launching viewer...")
         id_model = build_sim_model(scenario)
         exc = collect_mujoco_excitation(id_model, duration=12.0, subsample=5)
@@ -503,7 +564,7 @@ def run_viewer(controller_key: str, scenario: str, trajectory_kind: str) -> None
             data.mocap_pos[0] = ref.x_d
             tau = ctrl.compute(t, data.qpos.copy(), data.qvel.copy(), ref, dt)
             data.ctrl[:] = tau
-            if scenario == "perturbed" and (DISTURBANCE_T_START <= (t % 6.0) <= DISTURBANCE_T_END):
+            if SCENARIOS[scenario].impulse and (DISTURBANCE_T_START <= (t % 6.0) <= DISTURBANCE_T_END):
                 data.qfrc_applied[:] = DISTURBANCE_TORQUE
             else:
                 data.qfrc_applied[:] = 0.0
@@ -522,60 +583,68 @@ def run_benchmark(duration: float = 6.0) -> None:
     joint_traj = SmoothJointTrajectory(dyn)
     circle_traj = CartesianCircleTrajectory(dyn)
 
-    model_nom = build_sim_model("nominal")
-    model_pert = build_sim_model("perturbed")
+    models = {key: build_sim_model(key) for key in SCENARIOS}
 
-    # Identify Physics-Informed SINDy models from short 12s excitation rollouts
-    print("Running Physics-Informed SINDy identification on nominal & perturbed plants...")
-    exc_nom = collect_mujoco_excitation(model_nom, duration=12.0, subsample=5)
-    sindy_nom, m_nom = fit_sindy_model(exc_nom["q"], exc_nom["qd"], exc_nom["qdd"], exc_nom["tau"])
-    print(f"  [SINDy Nominal]   active={m_nom['n_terms_active']}/{m_nom['n_terms_total']}, R²={m_nom['r2_mean']:.5f}")
+    # Identify Physics-Informed SINDy models from short 12s excitation rollouts on each plant
+    print("Running Physics-Informed SINDy identification on nominal, mild & perturbed plants...")
+    sindy_models: dict[str, SINDyDynamics] = {}
+    for key, model in models.items():
+        exc = collect_mujoco_excitation(model, duration=12.0, subsample=5)
+        sindy_models[key], met = fit_sindy_model(exc["q"], exc["qd"], exc["qdd"], exc["tau"])
+        print(
+            f"  [SINDy {key.capitalize():<9}] active={met['n_terms_active']}/{met['n_terms_total']}, "
+            f"R²={met['r2_mean']:.5f}"
+        )
 
-    exc_pert = collect_mujoco_excitation(model_pert, duration=12.0, subsample=5)
-    sindy_pert, m_pert = fit_sindy_model(exc_pert["q"], exc_pert["qd"], exc_pert["qdd"], exc_pert["tau"])
-    print(f"  [SINDy Perturbed] active={m_pert['n_terms_active']}/{m_pert['n_terms_total']}, R²={m_pert['r2_mean']:.5f}")
+    # 1-3. Joint-trajectory benchmark on every plant
+    titles = {
+        "nominal": "BENCHMARK 1: NOMINAL PLANT (scene.xml, exact CAD, zero friction)",
+        "mild": "BENCHMARK 2: MILD MISMATCH (+5g payload, +10% m2, 10% AX-12A gearbox, no impulse)",
+        "perturbed": "BENCHMARK 3: PERTURBED / SIM-TO-REAL (+100g payload, +25% m2, AX-12A friction, impulse @2.5s)",
+    }
+    joint_results: dict[str, list[SimResult]] = {}
+    for scen, model in models.items():
+        ctrls = make_controllers(dyn, trajectory_fn=joint_traj, sindy_dyn=sindy_models[scen])
+        joint_results[scen] = [
+            simulate_controller(
+                key, ctrl, model, joint_traj, duration=duration, apply_disturbance=SCENARIOS[scen].impulse
+            )
+            for key, ctrl in ctrls.items()
+        ]
+        print_table(titles[scen], joint_results[scen])
 
-    # 1. Nominal joint-space + OSC + MPC + SINDy benchmark
-    nom_results: list[SimResult] = []
-    for key, ctrl in make_controllers(dyn, trajectory_fn=joint_traj, sindy_dyn=sindy_nom).items():
-        nom_results.append(simulate_controller(key, ctrl, model_nom, joint_traj, duration=duration, apply_disturbance=False))
-    print_table("BENCHMARK 1: NOMINAL PLANT (scene.xml, exact CAD, zero friction)", nom_results)
-
-    # 2. Perturbed / Sim-to-Real benchmark (+100 g payload, +25% link2 mass, AX-12A friction, impulse disturbance)
-    pert_results: list[SimResult] = []
-    for key, ctrl in make_controllers(dyn, trajectory_fn=joint_traj, sindy_dyn=sindy_pert).items():
-        pert_results.append(simulate_controller(key, ctrl, model_pert, joint_traj, duration=duration, apply_disturbance=True))
-    print_table(
-        "BENCHMARK 2: PERTURBED / SIM-TO-REAL (+100g payload, +25% m2, AX-12A friction, impulse @2.5s)",
-        pert_results,
-    )
-
-    # 3. Direct 3D Cartesian Circle benchmark
+    # 4. Direct 3D Cartesian Circle benchmark (nominal vs. full perturbation, no impulse)
     circle_keys = ("osc", "impedance", "ctc", "st_smc", "sindy_mpc")
     circle_nom: list[SimResult] = []
     circle_pert: list[SimResult] = []
-    nom_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_nom)
-    pert_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_pert)
+    nom_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_models["nominal"])
+    pert_ctrls_c = make_controllers(dyn, trajectory_fn=circle_traj, sindy_dyn=sindy_models["perturbed"])
     for key in circle_keys:
-        circle_nom.append(simulate_controller(key, nom_ctrls_c[key], model_nom, circle_traj, duration=duration, apply_disturbance=False))
-        circle_pert.append(simulate_controller(key, pert_ctrls_c[key], model_pert, circle_traj, duration=duration, apply_disturbance=False))
-    print_table("BENCHMARK 3A: 3D CARTESIAN CIRCLE (Nominal)", circle_nom)
-    print_table("BENCHMARK 3B: 3D CARTESIAN CIRCLE (Perturbed +100g + AX-12A friction)", circle_pert)
+        circle_nom.append(simulate_controller(key, nom_ctrls_c[key], models["nominal"], circle_traj, duration=duration, apply_disturbance=False))
+        circle_pert.append(simulate_controller(key, pert_ctrls_c[key], models["perturbed"], circle_traj, duration=duration, apply_disturbance=False))
+    print_table("BENCHMARK 4A: 3D CARTESIAN CIRCLE (Nominal)", circle_nom)
+    print_table("BENCHMARK 4B: 3D CARTESIAN CIRCLE (Perturbed +100g + AX-12A friction)", circle_pert)
 
     # Generate comparison figures
     plot_scenario(
-        nom_results,
+        joint_results["nominal"],
         "Nominal Plant Benchmark — Smooth 3-DOF Trajectory",
         RENDER_DIR / "benchmark_nominal.png",
         perturbed=False,
     )
     plot_scenario(
-        pert_results,
+        joint_results["mild"],
+        "Mild Mismatch Benchmark (+5 g Payload, +10% Link2 Mass, 10% AX-12A Gearbox)",
+        RENDER_DIR / "benchmark_mild.png",
+        perturbed=False,
+    )
+    plot_scenario(
+        joint_results["perturbed"],
         "Perturbed / Sim-to-Real Benchmark (+100 g Payload, +25% Link2 Mass, AX-12A Friction, Impulse)",
         RENDER_DIR / "benchmark_perturbed.png",
         perturbed=True,
     )
-    plot_summary_bars(nom_results, pert_results, RENDER_DIR / "benchmark_summary_bars.png")
+    plot_summary_bars(joint_results, RENDER_DIR / "benchmark_summary_bars.png")
     plot_cartesian_circle(circle_nom, circle_pert, RENDER_DIR / "cartesian_circle.png")
 
 
@@ -585,13 +654,16 @@ def main() -> None:
     parser.add_argument(
         "--controller",
         default="sindy_mpc",
-        choices=["pid", "pdg", "ctc", "adaptive", "smc", "st_smc", "fuzzy", "osc", "impedance", "mpc", "sindy_ctc", "sindy_mpc"],
+        choices=[
+            "pid", "pdg", "ctc", "adaptive", "smc", "st_smc", "fuzzy", "osc", "impedance",
+            "mpc", "mpc_dob", "sindy_ctc", "sindy_mpc_nodob", "sindy_mpc",
+        ],
         help="Controller to run in --viewer mode (default: sindy_mpc).",
     )
     parser.add_argument(
         "--scenario",
         default="nominal",
-        choices=["nominal", "perturbed"],
+        choices=list(SCENARIOS),
         help="Plant model for --viewer mode (default: nominal).",
     )
     parser.add_argument(
