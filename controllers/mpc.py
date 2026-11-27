@@ -37,6 +37,8 @@ class DynamicsPredictor(Protocol):
     def mass_matrix(self, q: np.ndarray) -> np.ndarray: ...
     def inverse_dynamics(self, q: np.ndarray, qd: np.ndarray, qdd: np.ndarray) -> np.ndarray: ...
     def forward_dynamics(self, q: np.ndarray, qd: np.ndarray, tau: np.ndarray) -> np.ndarray: ...
+    # Batched forward dynamics over (B, 3) arrays, used for horizon linearization
+    def forward_dynamics_batch(self, q: np.ndarray, qd: np.ndarray, tau: np.ndarray) -> np.ndarray: ...
 
 
 def _solve_qp_admm(
@@ -146,13 +148,13 @@ class LTVMPCController(BaseController):
         self._v_hat: np.ndarray | None = None
         self._d_hat = np.zeros(3, dtype=np.float64)
 
-    # ---- Discrete RK4 dynamics & linearization ----
+    # ---- Discrete RK4 dynamics & linearization (batched over rows of (B, 6) / (B, 3)) ----
     def _f_cont(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
-        q = x[:3]
-        qd = np.clip(x[3:], -30.0, 30.0)
-        qdd = self.dyn.forward_dynamics(q, qd, u + self._d_hat)
+        q = x[:, :3]
+        qd = np.clip(x[:, 3:], -30.0, 30.0)
+        qdd = self.dyn.forward_dynamics_batch(q, qd, u + self._d_hat)
         qdd = np.clip(qdd, -500.0, 500.0)
-        return np.concatenate([qd, qdd])
+        return np.concatenate([qd, qdd], axis=1)
 
     def _rk4_step(self, x: np.ndarray, u: np.ndarray, substeps: int = 2) -> np.ndarray:
         h = self.mpc_dt / substeps
@@ -165,22 +167,31 @@ class LTVMPCController(BaseController):
             xs = xs + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
         return xs
 
-    def _linearize_step(self, x: np.ndarray, u: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Linearize x_{k+1} = f(x, u) around (x, u): x_{k+1} ≈ A*x_k + B*u_k + c."""
-        f0 = self._rk4_step(x, u)
+    def _linearize_horizon(
+        self, x_nom: np.ndarray, u_nom: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Linearize x_{k+1} = f(x_k, u_k) at every horizon node in one batched RK4 pass.
+
+        Forward finite differences (eps = 1e-5) over the 6 states and 3 inputs:
+        each node contributes 1 nominal + 9 perturbed rows, so the whole horizon is
+        a single (10*N, 6) RK4 evaluation instead of 10*N sequential ones.
+        Returns A (N, 6, 6), B (N, 6, 3), c (N, 6) with x_{k+1} ≈ A_k x_k + B_k u_k + c_k.
+        """
+        N = x_nom.shape[0]
         eps_x = 1e-5
         eps_u = 1e-5
-        A = np.zeros((6, 6), dtype=np.float64)
-        B = np.zeros((6, 3), dtype=np.float64)
-        for i in range(6):
-            dx = np.zeros(6)
-            dx[i] = eps_x
-            A[:, i] = (self._rk4_step(x + dx, u) - f0) / eps_x
-        for j in range(3):
-            du = np.zeros(3)
-            du[j] = eps_u
-            B[:, j] = (self._rk4_step(x, u + du) - f0) / eps_u
-        c = f0 - A @ x - B @ u
+        n_pert = 1 + 6 + 3
+
+        X = np.repeat(x_nom[:, None, :], n_pert, axis=1)  # (N, 10, 6)
+        U = np.repeat(u_nom[:, None, :], n_pert, axis=1)  # (N, 10, 3)
+        X[:, 1:7, :] += eps_x * np.eye(6)
+        U[:, 7:10, :] += eps_u * np.eye(3)
+
+        F = self._rk4_step(X.reshape(-1, 6), U.reshape(-1, 3)).reshape(N, n_pert, 6)
+        f0 = F[:, 0, :]  # (N, 6)
+        A = np.swapaxes((F[:, 1:7, :] - f0[:, None, :]) / eps_x, 1, 2)  # (N, 6, 6)
+        B = np.swapaxes((F[:, 7:10, :] - f0[:, None, :]) / eps_u, 1, 2)  # (N, 6, 3)
+        c = f0 - np.einsum("kij,kj->ki", A, x_nom) - np.einsum("kij,kj->ki", B, u_nom)
         return A, B, c
 
     def _build_reference_horizon(self, t: float, ref: TrajectoryReference) -> tuple[np.ndarray, np.ndarray]:
@@ -243,12 +254,7 @@ class LTVMPCController(BaseController):
         u_nom = U_ref.reshape(N, 3)
 
         # Condense LTV dynamics: X = x_free + Gamma * U
-        A_list, B_list, c_list = [], [], []
-        for k in range(N):
-            Ak, Bk, ck = self._linearize_step(x_nom[k], u_nom[k])
-            A_list.append(Ak)
-            B_list.append(Bk)
-            c_list.append(ck)
+        A_list, B_list, c_list = self._linearize_horizon(x_nom, u_nom)
 
         Gamma = np.zeros((6 * N, 3 * N), dtype=np.float64)
         x_free = np.zeros(6 * N, dtype=np.float64)

@@ -239,6 +239,65 @@ class AnalyticalDynamics:
         b = self.coriolis_matrix(q, qd, theta) @ qd + self.gravity_vector(q, theta)
         return np.linalg.solve(M, tau - b)
 
+    def forward_dynamics_batch(
+        self,
+        q: np.ndarray,
+        qd: np.ndarray,
+        tau: np.ndarray,
+        theta: np.ndarray | None = None,
+    ) -> np.ndarray:
+        """Vectorized `forward_dynamics` for a batch of states: inputs/outputs of shape (B, 3).
+
+        Same closed-form M(q), C(q, qd)*qd, G(q) as the single-state methods,
+        evaluated with array arithmetic so MPC linearization avoids per-state
+        Python overhead.
+        """
+        th = self.theta_nominal if theta is None else theta
+        g = self.params.g
+        q = np.atleast_2d(q)
+        qd = np.atleast_2d(qd)
+        tau = np.atleast_2d(tau)
+        q2, q3 = q[:, 1], q[:, 2]
+        qd1, qd2, qd3 = qd[:, 0], qd[:, 1], qd[:, 2]
+        q23 = q2 + q3
+        c2, s2 = np.cos(q2), np.sin(q2)
+        c23, s23 = np.cos(q23), np.sin(q23)
+        c3, s3 = np.cos(q3), np.sin(q3)
+
+        # Inertia matrix (block-diagonal: M11 decoupled from the 2x2 pitch block)
+        B = len(q)
+        M = np.zeros((B, 3, 3), dtype=np.float64)
+        M[:, 0, 0] = (
+            th[0]
+            + th[1] * c2 * c2
+            + th[2] * s2 * s2
+            + th[3] * c23 * c23
+            + th[4] * s23 * s23
+            + 2.0 * th[5] * s2 * s23
+        )
+        M[:, 1, 1] = th[6] + th[7] + 2.0 * th[5] * c3
+        M[:, 1, 2] = M[:, 2, 1] = th[7] + th[5] * c3
+        M[:, 2, 2] = th[7]
+
+        # Coriolis/centrifugal vector C(q, qd) @ qd (rows of `coriolis_matrix` times qd)
+        a2 = (
+            (th[2] - th[1]) * s2 * c2
+            + (th[4] - th[3]) * s23 * c23
+            + th[5] * (c2 * s23 + s2 * c23)
+        )
+        a3 = (th[4] - th[3]) * s23 * c23 + th[5] * s2 * c23
+        h = -th[5] * s3
+        b = np.empty((B, 3), dtype=np.float64)
+        b[:, 0] = (a2 * qd2 + a3 * qd3) * qd1 + a2 * qd1 * qd2 + a3 * qd1 * qd3
+        b[:, 1] = -a2 * qd1 * qd1 + h * qd3 * qd2 + h * (qd2 + qd3) * qd3
+        b[:, 2] = -a3 * qd1 * qd1 - h * qd2 * qd2
+
+        # Gravity
+        b[:, 1] += -g * (th[8] * s2 + th[9] * s23)
+        b[:, 2] += -g * (th[9] * s23)
+
+        return np.linalg.solve(M, (tau - b)[..., None])[..., 0]
+
     def regressor(
         self,
         q: np.ndarray,
